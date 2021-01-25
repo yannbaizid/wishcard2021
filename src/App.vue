@@ -1,12 +1,63 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <wish-card v-if="false" />
+<div @click="generateText"> UN AUTRE</div>
+{{text}}
   </div>
 </template>
+
+<script>
+import WishCard from "./views/WishCard.vue";
+import webcontroller from "./services/webcontroller.js";
+export default {
+  components: { WishCard },
+  data() {
+    return {
+      qualityList: [],
+      text: "",
+      adjective: {}
+    };
+  },
+  async mounted() {
+  this.generateText();
+  },
+  methods: {
+    async generateText() {
+        await webcontroller.getQualityList(5).then((response) => {
+      console.log(response);
+      this.qualityList = response;
+    });
+
+    await webcontroller.getAdjective().then((response) => {
+      console.log(response);
+      this.adjective = response;
+    });
+
+var rdmIndex = Math.ceil(Math.random()*(this.qualityList.length-2));
+    this.text = "Nous vous souhaitons";
+    for (var i = 0; i < this.qualityList.length; i++) {
+      if (i > 0 && i < this.qualityList.length - 1) {
+        this.text += ",";
+      }
+      
+      if (i == this.qualityList.length - 1) {
+        this.text += " et ";
+      }
+
+      this.text+=" "+this.qualityList[i].text;
+      if (i == this.qualityList.length - 1) {
+        this.text += ". C'est important, "+this.qualityList[i].text+".";
+      }
+        if (i==rdmIndex) {
+          this.text+=" ("+this.adjective.text+")";
+  
+        }
+    }
+    console.log(this.text);
+    }
+  }
+};
+</script>
 
 <style lang="scss">
 #app {
